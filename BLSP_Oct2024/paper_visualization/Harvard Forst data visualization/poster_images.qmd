@@ -1,0 +1,356 @@
+---
+title: "poster_images"
+description: "[TBD]"
+author:
+  - name: Matthew Shisler
+    affiliation: North Carloina State University - Department of Statistics
+    affiliation-url: https://statistics.sciences.ncsu.edu/ 
+date: "06/20/2023"
+categories: [Bayesian, MCMC, Spatial, MCAR] # self-defined categories
+draft: true 
+format:
+  html: 
+    code-fold: false
+execute: 
+  eval: false
+  cache: false
+  freeze: false
+---
+
+
+```{r}
+#| label: load-packages
+#| output: false
+#| code-summary: "Code: Load the packages"
+
+library(tidyverse)
+library(tmap)
+library(terra)
+library(ncdf4)
+library(lubridate)
+library(viridis)
+library(patchwork)
+```
+
+## Harvard Forest
+
+Data pre-processing from the netCDF is unpublished. The Harvard Forest data is stored in a long-format csv file which we import here. The file is about 0.5 GB.
+
+```{r}
+long_hf <- read_csv("long_hf.csv")
+```
+
+A map of EVI2 for one satellite pass.
+
+```{r}
+#| code-fold: true
+
+ggplot(subset(long_hf, name %in% c("EVI2_490"))) +
+        geom_tile(aes(x, y, fill=EVI2)) +
+        scale_fill_gradientn(colors = terrain.colors(4,rev = T)[-1],
+                             limits = c(0,1)) +
+
+        coord_fixed() + 
+        scale_y_reverse() +
+        theme_void() +
+        theme(legend.key.size = unit(1, 'cm'), #change legend key size
+              legend.key.height = unit(2, 'cm'), #change legend key height
+              legend.key.width = unit(1, 'cm'), #change legend key width
+              legend.title = element_text(size=14), #change legend title font size
+              legend.text = element_text(size=14)) #change legend text font size+
+
+```
+
+Let's plot a sequence of these passes maps to explore the evolution of EVI2 over the course of 2015. This illustrates some potential problems with the data that were not obvious from the individual pixel time series.
+
+First, the missingness due to cloud cover is pervasive. Could it be that the day of year and the amount of cloud cover is correlated?
+
+Second, there are some "banding" issues in the sensors for some snapshots. This is a different type of missingness than that related to cloud cover. Could this be a sensor malfuction? 
+
+Third, there are some layers that are clearly wrong, indicating EVI2 values near 0 for the entire spatial extent and which also does not agree with time-adjacent layers. Could this be a failure of the cloud classification algorithm?
+```{r}
+#| code-fold: true
+
+panel_names <- as_labeller(function(x) paste(x, "Day", yday(x)))
+
+ggplot(subset(long_hf, year %in% 2015)) +
+        geom_tile(aes(x, y, fill=EVI2)) +
+        scale_fill_gradientn(colors = terrain.colors(4,rev = T)[-1],
+                             limits = c(0,1)) +
+        coord_fixed() + 
+        theme_void() +
+        facet_wrap(~date, labeller = panel_names) +
+        labs(title = paste0(2015, ": day of year"))  
+
+```
+
+Some years exhibit fewer problems. Here is 2018.
+
+```{r}
+#| code-fold: true
+
+ggplot(subset(long_hf, year %in% 1992)) +
+        geom_tile(aes(x, y, fill=EVI2)) +
+        scale_fill_gradientn(colors = terrain.colors(8,rev = T)[4:8],
+                             limits = c(0.0,1)) +
+        coord_fixed() + 
+        theme_void() +
+        facet_wrap(~date, labeller = panel_names) +
+        labs(title = paste0(2018, ": day of year"))  
+
+```
+
+
+```{r, fig.height=4, fig.width=7}
+#| code-fold: true
+#| eval: false
+
+# colors = terrain.colors(8,rev = T)[4:8]
+
+panel_names <- as_labeller(function(x) paste0(mday(x), " ", month(x, label = T, abbr = T), " ", "(", yday(x), ")"))
+
+ggplot() +
+        geom_raster(data = subset(long_hf, year %in% 1993 & doy %in% c( 26, 115, 131, 163, 195, 243, 275, 314)),aes(x, y, fill=EVI2)) +
+        scale_fill_gradientn(colors = viridis(8, direction = -1),
+                             limits = c(0.0,1)) +
+           # geom_point(data = subset(long_hf, cell %in% c(7825) & year %in% 1993 & doy %in% c( 26, 115, 131, 163, 195, 243, 275, 314)),
+           #        aes(x, y), color = "red", size = 1.1, shape = "square") +
+        coord_fixed() +
+        scale_y_reverse() +
+        labs(x = "Date (day of year)") +
+        theme_void() + 
+          theme(legend.key.size = unit(1, 'cm'), #change legend key size
+                legend.key.height = unit(1.7, 'cm'), #change legend key height
+                legend.key.width = unit(1, 'cm'), #change legend key width
+                # legend.title = element_blank(), #change legend title font size
+                legend.text = element_text(size=12),
+                strip.text.x = element_text(size=12, vjust = 1),
+                panel.spacing.x = unit(-0.5, "lines"),
+                panel.spacing.y = unit(1, "lines"),
+                plot.title = element_text(size = 12, vjust = 3),
+                plot.margin = margin(8,0,0,0, unit = "pt"),
+                legend.position = "left") + 
+        facet_wrap(~date, labeller = panel_names, nrow = 2)
+
+ggsave("example_evi2_evolution_year_legend_left.pdf", width = 7, height = 4, units = "in", device = "pdf")
+
+```
+
+```{r}
+# ggsave("example_evi2_evolution_year_t.pdf", width = 14, height = 6, units = "in", device = "pdf")
+```
+
+
+```{r,fig.height=2, fig.width=7}
+ggplot() +
+       geom_point(data = subset(long_hf, cell %in% c(7825) & year >= 1990 & year <= 1995),
+                  aes(date, EVI2), size = 1) +
+       # geom_point(data = subset(long_hf, cell %in% c(7825) & year %in% 1993 & doy %in% c( 26, 115, 131, 163, 195, 243, 275, 314)),
+       #            aes(date, EVI2), color = "red", size = 1.02) +
+       geom_vline(aes(xintercept = as.Date("1991-01-01")), lty = 2, color = "grey58") +
+       geom_vline(aes(xintercept = as.Date("1992-01-01")), lty = 2, color = "gray58") +
+       geom_vline(aes(xintercept = as.Date("1993-01-01")), lty = 2, color = "grey58") +
+       geom_vline(aes(xintercept = as.Date("1994-01-01")), lty = 2, color = "grey58") +
+       geom_vline(aes(xintercept = as.Date("1995-01-01")), lty = 2, color = "grey58") +
+       geom_point(aes(x = as.Date("1993-01-26"), y = 0.139), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-04-25"), y = 0.228), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-05-11"), y = 0.451), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-06-12"), y = 0.787), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-07-14"), y = 0.787), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-08-31"), y = 0.787), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-10-02"), y = 0.596), color = "red", size = 1) +
+       geom_point(aes(x = as.Date("1993-11-10"), y = 0.194), color = "red", size = 1) +
+       # geom_vline(aes(xintercept = as.Date("1993-04-25")), lty = 2, color = "red") +
+       # geom_text(aes(x = as.Date("1991-06-01"), y = -0.1, label = "1991")) +
+       scale_y_continuous(limits = c(0,1)) +
+       scale_x_continuous(limits = c(as.Date("1990-01-01"),
+                                     as.Date("1995-12-31")),
+                          breaks = c(as.Date("1990-07-02"),
+                                     as.Date("1991-07-02"),
+                                     as.Date("1992-07-02"),
+                                     as.Date("1993-07-02"),
+                                     as.Date("1994-07-02"),
+                                     as.Date("1995-07-02")),
+                          labels = c(1990:1995),
+                          expand = c(0,0)) +
+       # labs(title = "Decadal Record of Remote-Sensed Vegetation Index EVI2 - 2010-2020",  "Time") +
+       labs(x = "Time") +
+       theme_bw() + 
+       theme(axis.title.x = element_text(size = 12),
+             axis.title.y = element_text(size = 12),
+             axis.text.x = element_text(size = 12),
+             axis.text.y = element_text(size = 12),
+             plot.title = element_text(size = 12),
+             axis.ticks = element_blank())
+```
+
+```{r,fig.height=2, fig.width=7}
+ggplot() +
+       geom_point(data = subset(long_hf, cell %in% c(7825) & year >= 1996 & year <= 2001),
+                  aes(date, EVI2), size = 1) +
+       # geom_point(data = subset(long_hf, cell %in% c(7825) & year %in% 1993 & doy %in% c( 26, 115, 131, 163, 195, 243, 275, 314)),
+       #            aes(date, EVI2), color = "red", size = 1.02) +
+       geom_vline(aes(xintercept = as.Date("1997-01-01")), lty = 2, color = "grey58") +
+       geom_vline(aes(xintercept = as.Date("1998-01-01")), lty = 2, color = "gray58") +
+       geom_vline(aes(xintercept = as.Date("1999-01-01")), lty = 2, color = "grey58") +
+       geom_vline(aes(xintercept = as.Date("2000-01-01")), lty = 2, color = "grey58") +
+       geom_vline(aes(xintercept = as.Date("2001-01-01")), lty = 2, color = "grey58") +
+       # geom_vline(aes(xintercept = as.Date("1993-04-25")), lty = 2, color = "red") +
+       # geom_text(aes(x = as.Date("1991-06-01"), y = -0.1, label = "1991")) +
+       scale_y_continuous(limits = c(0,1)) +
+       scale_x_continuous(limits = c(as.Date("1996-01-01"),
+                                     as.Date("2001-12-31")),
+                          breaks = c(as.Date("1996-07-02"),
+                                     as.Date("1997-07-02"),
+                                     as.Date("1998-07-02"),
+                                     as.Date("1999-07-02"),
+                                     as.Date("2000-07-02"),
+                                     as.Date("2001-07-02")),
+                          labels = c(1996:2001),
+                          expand = c(0,0)) +
+       # labs(title = "Decadal Record of Remote-Sensed Vegetation Index EVI2 - 2010-2020",  "Time") +
+       labs(x = "Time") +
+       theme_bw() + 
+       theme(axis.title.x = element_text(size = 12),
+             axis.title.y = element_text(size = 12),
+             axis.text.x = element_text(size = 12),
+             axis.text.y = element_text(size = 12),
+             plot.title = element_text(size = 12),
+             axis.ticks = element_blank())
+
+```
+
+
+```{r}
+ggsave("example_evi2_evolution_site_partitioned_1990_2005.pdf", width = 7, height = 2, units = "in", device = "pdf")
+
+```
+
+Supplemental panels for every year of the Harvard Forest data set can be found at the end of this post.
+
+Next we plot complete observed time series of for several pixels individually to get an idea of how LSP evolves over time.
+```{r}
+#| code-fold: true
+
+test_pix <- replicate(10,sample(unique(long_hf$cell), 4))
+
+panel_names <- as_labeller(function(x) paste("pixel:", x))
+
+for (i in 1:10){
+  g <- ggplot(subset(long_hf, cell %in% test_pix[,i])) +
+         geom_point(aes(date, EVI2)) +
+         scale_y_continuous(limits = c(0,1)) +
+         facet_wrap(~cell, labeller = panel_names) +
+         theme_bw()
+  print(g)
+}  
+
+```
+
+Some pixels exhibit interesting behavior. Here are pixels 4803, 6281, 6750, and 7614.
+
+```{r}
+#| code-fold: true
+
+int_pix <- c(6281, 4803, 6750, 7614)
+
+ggplot(subset(long_hf, cell %in% int_pix)) +
+   geom_point(aes(date, EVI2)) +
+   scale_y_continuous(limits = c(0,1)) +
+   facet_wrap(~cell, labeller = panel_names) +
+   theme_bw()
+
+```
+
+It is easy to see from the complete time series how the maximum or mininum VI might change over time. Other behavior is less obviouos. Let's alter the plot slightly by overlapping data by year.
+
+```{r}
+#| code-fold: true
+
+test_pix <- replicate(10,sample(unique(long_hf$cell), 4))
+
+panel_names <- as_labeller(function(x) paste("pixel:", x))
+
+for (i in 1:10){
+  g <- ggplot(subset(long_hf, cell %in% test_pix[,i])) +
+         geom_point(aes(doy, EVI2, color = year)) +
+         scale_y_continuous(limits = c(0,1)) +
+         facet_wrap(~cell, labeller = panel_names) +
+         theme_bw()
+  print(g)
+}  
+
+```
+
+Here are the same interesting pixels as before (4803, 6281, 6750, and 7614).
+
+```{r}
+#| code-fold: true
+
+int_pix <- c(6281, 4803, 6750, 7614)
+
+ggplot(subset(long_hf, cell %in% int_pix)) +
+   geom_point(aes(doy, EVI2, color = year)) +
+   scale_y_continuous(limits = c(0,1)) +
+   facet_wrap(~cell, labeller = panel_names) +
+   theme_bw()
+
+```
+
+Next we will plot the observed data aggregated over the entire extent by year. We use boxplots instead of points to avoid overplotting individual pixels. From this it may not be wise to use data from 1984. There is also so interesting anomolies that in a few inter-year periods, particularly between 2013-2014 and 2014-2015.
+
+1992-2012 seem to be the most regular.
+
+```{r}
+#| code-fold: true
+#| warning: false
+
+plot_years <- matrix(c(unique(long_hf$year), 0, 0, 0), nrow=4)
+
+panel_names <- as_labeller(function(x) x)
+
+for (t in 1:10){
+  g <- ggplot(subset(long_hf, year == plot_years[,t])) +
+         geom_boxplot(aes(x = doy, y = EVI2, group = doy), 
+                      width = 3,
+                      outlier.size = 0.4) +
+         scale_y_continuous(limits = c(0,1)) +
+         scale_x_continuous(limits = c(0, 365)) +
+         facet_wrap(~year, labeller = panel_names) +
+         theme_bw()
+  
+  print(g)
+}
+
+```
+
+
+In the next HF post, we need to fit an "average model" to the region. There are few ways to do this. One way is to extract pixel-wise time series for the entire region, aggregate over pixels, then fit a non-linear model. Another way is to average over each spatraster layer, then associate that average with the layer's corresponding day of the year and fit a model to these averages. There may be issues in the latter approach becuase some layers have a very low number of valid observations. Perhaps the solution is a weighted average?
+
+## Supplemental
+
+Supplemental panels for every year of the Harvard Forest data set. Years from early in the data collection have fewer snapshots which is to be expected with the lack of satellite programs active at that time.
+
+```{r}
+#| code-fold: true
+
+hf_years <- unique(long_hf$year)
+
+panel_names <- as_labeller(function(x) yday(x))
+
+for (t in hf_years){
+  g <- ggplot(subset(long_hf, year == t)) +
+        geom_tile(aes(x, y, fill=EVI2)) +
+        scale_fill_gradientn(colors = viridis(10, direction = -1),
+                             limits = c(0,1)) +
+
+            coord_fixed() + 
+            theme_void() +
+            facet_wrap(~date, labeller = panel_names) +
+            labs(title = paste(t, "- day of year"))
+  print(g)
+}
+
+```
+
+

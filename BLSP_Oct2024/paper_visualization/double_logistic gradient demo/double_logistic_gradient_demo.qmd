@@ -1,0 +1,115 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+library(ggplot2)
+library(tidyr)
+library(extrafont)
+```
+
+
+
+```{r}
+
+eta <- c(-1.4, -0.15, 100, 2.6, 265, 2.8, 5)
+
+source("/Users/matthewshisler/blsp_spatial_sim_2024/2_Rfuncs/double_logis7.R")
+
+model.form <- as.formula("y ~ 1/(1 + exp(-theta1)) + 
+                       (((exp(theta2) + (theta3 + (theta5 - theta3)/2 - t)*theta7/(1e4) - 1/(1 + exp(-theta1))) / (1 + exp((theta3 - t) / exp(theta4)))) - 
+                       ((exp(theta2) +(theta3 + (theta5 - theta3)/2 - t)*theta7/(1e4) - 1/(1 + exp(-theta1))) / (1 + exp((theta5 - t) / exp(theta6)))))")
+
+# model.form <- as.formula("y ~ 1/(1 + exp(-theta1)) + 
+#                        (((exp(theta2) - (t)*theta7/(1e4) - 1/(1 + exp(-theta1))) / (1 + exp((theta3 - t) / exp(theta4)))) - 
+#                        ((exp(theta2) - (t)*theta7/(1e4) - 1/(1 + exp(-theta1))) / (1 + exp((theta5 - t) / exp(theta6)))))")
+# 
+# model.form <- as.formula("y ~ 1/(1 + exp(-theta1)) + 
+#                        (((exp(theta2) - (t)*theta7/(1e4) ) / (1 + exp((theta3 - t) / exp(theta4)))) - 
+#                        ((exp(theta2) - (t)*theta7/(1e4) ) / (1 + exp((theta5 - t) / exp(theta6)))))")
+
+# obtain analytical gradient.
+dl.grad <- deriv(model.form, 
+                    c("theta1", "theta2", "theta3", 
+                      "theta4", "theta5", "theta6", "theta7"),
+                    function(theta1, theta2, theta3,
+                             theta4, theta5, theta6, theta7, t){})
+# define gradient matrix function.
+generate_grad_matrix <- function(theta, doy){
+  return(attr(dl.grad(theta[1], theta[2], theta[3],
+                      theta[4], theta[5], theta[6], theta[7],
+                      doy), "gradient"))
+}
+
+
+matplot(generate_grad_matrix(eta, 1:366), type = "l")
+matplot(scale(generate_grad_matrix(eta, 1:366), center = F), type = "l")
+```
+
+```{r}
+text.size <- 12
+extrafont::loadfonts(device = "pdf") # call this once per session
+X <- data.frame(generate_grad_matrix(eta, 1:366), d = 1:366)
+
+X.df <- pivot_longer(X, cols = starts_with("theta"), names_to = "theta", names_prefix = "theta")
+
+ggplot(X.df) +
+  geom_line(aes(x = d, y = value, 
+                group = theta, linetype = theta, color = theta)) +
+  labs(color = expression("\u2113"), linetype = expression("\u2113")) +
+  theme_bw(base_size = text.size) +
+  ylab(bquote(X["\u2113"~d])) +
+  xlab("Day of year, d")
+  
+ggsave("dl_grad_demo_raw.png", width = 6, height = 3, units = "in", device = "png")
+
+```
+
+```{r}
+text.size <- 20
+
+X <- data.frame(scale(generate_grad_matrix(eta, 1:366)), d = 1:366)
+
+X.df <- pivot_longer(X, cols = starts_with("theta"), names_to = "theta", names_prefix = "theta")
+
+ggplot(X.df) +
+  geom_line(aes(x = d, y = value, 
+                group = theta, linetype = theta, color = theta)) +
+  labs(color = bquote(theta[k]), linetype = bquote(theta[k])) +
+  theme_bw(base_size = text.size)
+
+
+```
+
+
+```{r}
+
+theta <- c(-1.5, -0.06, 105, 2.4, 270, 2.77, 6)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta = eta))) + 
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta = theta)), color = "red") + 
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(limits = c(0, 366)) +
+  labs(x = "d", y = "Y") +
+  theme_bw()
+
+```
+
+```{r}
+
+
+test <- double_logis7(1:366, eta) - generate_grad_matrix(eta, 1:366)%*%eta + generate_grad_matrix(eta, 1:366)%*%theta
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta = eta))) + 
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta = theta)), color = "red") + 
+  geom_line(aes(x = 1:366, y = test), color = "cyan3", linetype = 2) + 
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(limits = c(0, 366)) +
+  labs(x = "Day of year, d", y = "Y") +
+  theme_bw()
+
+
+```

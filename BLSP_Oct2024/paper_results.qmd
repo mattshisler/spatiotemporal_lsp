@@ -1,0 +1,626 @@
+---
+title: "paper_results"
+format: html
+---
+
+```{r}
+library(ggplot2)
+library(patchwork)
+library(lubridate)
+```
+
+```{r}
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_80_rho2_80.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+j <- 2
+for(k in 1:p){
+
+limits.disp <- quantile(mcmc.summaries.80$B$B.mean[[j]][k,], probs = c(0.001,0.999), names = F) 
+data.disp   <- mcmc.summaries.80$B$B.mean[[j]][k,]
+data.disp[data.disp <= limits.disp[1]] <- limits.disp[1]
+data.disp[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+}
+
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_90_rho2_90.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+j <- 2
+for(k in 1:p){
+
+limits.disp <- quantile(mcmc.summaries.80$B$B.mean[[j]][k,], probs = c(0.001,0.999), names = F) 
+data.disp   <- mcmc.summaries.80$B$B.mean[[j]][k,]
+data.disp[data.disp <= limits.disp[1]] <- limits.disp[1]
+data.disp[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+}
+
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_95_rho2_95.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+j <- 2
+for(k in 1:p){
+
+limits.disp <- quantile(mcmc.summaries.80$B$B.mean[[j]][k,], probs = c(0.001,0.999), names = F) 
+data.disp   <- mcmc.summaries.80$B$B.mean[[j]][k,]
+data.disp[data.disp <= limits.disp[1]] <- limits.disp[1]
+data.disp[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+}
+
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_99_rho2_99.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+j <- 2
+for(k in 1:p){
+
+limits.disp <- quantile(mcmc.summaries.80$B$B.mean[[j]][k,], probs = c(0.001,0.999), names = F) 
+data.disp   <- mcmc.summaries.80$B$B.mean[[j]][k,]
+data.disp[data.disp <= limits.disp[1]] <- limits.disp[1]
+data.disp[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+}
+
+```
+
+
+```{r}
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_80_rho2_80.RDS")
+mcmc.summaries.90 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_90_rho2_90.RDS")
+mcmc.summaries.95 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_95_rho2_95.RDS")
+mcmc.summaries.89 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_99_rho2_99.RDS")
+
+mcmc.summaries.80$eta$eta.lower[[2]]
+mcmc.summaries.90$eta$eta.lower[[2]]
+mcmc.summaries.95$eta$eta.lower[[2]]
+mcmc.summaries.99$eta$eta.lower[[2]]
+
+mcmc.summaries.80$eta$eta.upper[[2]]
+mcmc.summaries.90$eta$eta.upper[[2]]
+mcmc.summaries.95$eta$eta.upper[[2]]
+mcmc.summaries.99$eta$eta.upper[[2]]
+```
+
+```{r}
+
+
+j <- 2
+k <- 7
+
+limits.disp <- quantile(c(mcmc.summaries.80$B$B.mean[[j]][k,],
+  mcmc.summaries.90$B$B.mean[[j]][k,],
+  mcmc.summaries.95$B$B.mean[[j]][k,],
+  mcmc.summaries.99$B$B.mean[[j]][k,]) , probs = c(0.001,0.999), names = F) 
+
+
+data.disp.80   <- mcmc.summaries.80$B$B.mean[[j]][k,]
+# data.disp.80[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.80[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+data.disp.90   <- mcmc.summaries.90$B$B.mean[[j]][k,]
+# data.disp.90[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.90[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+data.disp.95   <- mcmc.summaries.95$B$B.mean[[j]][k,]
+# data.disp.95[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.95[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+data.disp.99   <- mcmc.summaries.99$B$B.mean[[j]][k,]
+# data.disp.99[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.99[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.80)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.90)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.95)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+print(ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.99)) +
+  scale_fill_gradient2(limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void())
+```
+
+```{r}
+j <- 2
+k <- 3
+
+
+for(i in 1:m){
+limits.disp <- quantile(c(mcmc.summaries.80$Theta$Theta.mean[k,i,],
+                          mcmc.summaries.90$Theta$Theta.mean[k,i,],
+                          mcmc.summaries.95$Theta$Theta.mean[k,i,],
+                          mcmc.summaries.99$Theta$Theta.mean[k,i,]) , probs = c(0.001,0.999), names = F) 
+
+
+data.disp.80   <-mcmc.summaries.80$Theta$Theta.mean[k,i,]
+# data.disp.80[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.80[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+data.disp.90   <- mcmc.summaries.90$Theta$Theta.mean[k,i,]
+# data.disp.90[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.90[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+data.disp.95   <- mcmc.summaries.95$Theta$Theta.mean[k,i,]
+# data.disp.95[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.95[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+data.disp.99   <- mcmc.summaries.99$Theta$Theta.mean[k,i,]
+# data.disp.99[data.disp <= limits.disp[1]] <- limits.disp[1]
+# data.disp.99[data.disp >= limits.disp[2]] <- limits.disp[2]
+
+p1 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.80)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void()
+p2 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.90)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void()
+p3 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.95)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void()
+p4 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp.99)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp) +
+  scale_y_reverse() +
+  labs(fill = bquote(beta[.(j)~","~.(k)])) +
+  coord_fixed() +
+  theme_void()
+
+print(p1 + p2 + p3 + p4)
+}
+```
+
+
+```{r}
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_80_rho2_80.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+
+limits.disp3 <- quantile(mcmc.summaries.80$B$B.mean[[2]][1,], probs = c(0.001,0.999), names = F)
+data.disp3   <- mcmc.summaries.80$B$B.mean[[2]][1,]
+data.disp3[data.disp3 >= limits.disp3[2]] <- limits.disp3[2]
+data.disp3[data.disp3 <= limits.disp3[1]] <- limits.disp3[1]
+p3 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp3)) +
+  scale_fill_gradient2(limits = limits.disp3) +
+  labs(fill = " Dormant VI") +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void()
+
+limits.disp4 <- quantile(mcmc.summaries.80$B$B.mean[[2]][2,], probs = c(0.001,0.999), names = F)
+data.disp4   <- mcmc.summaries.80$B$B.mean[[2]][2,]
+
+data.disp4[data.disp4 >= limits.disp4[2]] <- limits.disp4[2]
+data.disp4[data.disp4 <= limits.disp4[1]] <- limits.disp4[1]
+p4 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp4)) +
+  scale_fill_gradient2(limits = limits.disp4) +
+  labs(fill = "Mid-season VI") +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void()
+
+j <- 2
+k <- 3
+limits.disp1 <- quantile(mcmc.summaries.80$B$B.mean[[2]][3,], probs = c(0.001,0.999), names = F) 
+data.disp1   <- mcmc.summaries.80$B$B.mean[[2]][3,]
+data.disp1[data.disp1 >= limits.disp1[2]] <- limits.disp1[2]
+data.disp1[data.disp1 <= limits.disp1[1]] <- limits.disp1[1]
+p1 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp1)) +
+  scale_fill_gradient2(limits = limits.disp1) +
+  labs(fill = "SOS DOY") +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void()
+
+k <- 5
+limits.disp2 <- quantile(mcmc.summaries.80$B$B.mean[[2]][5,], probs = c(0.001,0.999), names = F) 
+data.disp2   <- mcmc.summaries.80$B$B.mean[[2]][5,]
+data.disp2[data.disp2 >= limits.disp2[2]] <- limits.disp2[2]
+data.disp2[data.disp2 <= limits.disp2[1]] <- limits.disp2[1]
+p2 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp2)) +
+  scale_fill_gradient2(limits = limits.disp2) +
+  labs(fill = "EOS DOY") +
+  coord_fixed() +
+  theme_void()
+
+# p2
+
+# p1 + p2 + plot_layout(guides = "keep", axes = "keep")
+# 
+# p1 | p2
+# 
+# p1
+
+# (p3 | p4) / (p1 + p2)
+
+# ((p3 / p1) | (p4 / p2)) & theme(legend.justification = "left") & plot_annotation(title =  bquote("Year Coefficient: "~beta["Year, -"]))
+((p3 / p1) | (p4 / p2)) & theme(legend.justification = "left")
+
+# ggsave("beta_year_notitle.pdf", width = 7, height = 4, units = "in", device = "pdf")
+```
+
+```{r}
+
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_80_rho2_80.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+
+# limits.disp3 <- quantile(mcmc.summaries.80$B$B.mean[[1]][1,], probs = c(0.001,0.999), names = F) 
+# data.disp3   <- mcmc.summaries.80$B$B.mean[[1]][1,]
+limits.disp3 <- quantile(plogis(mcmc.summaries.80$B$B.mean[[1]][1,]), probs = c(0.001,0.999), names = F) 
+data.disp3   <- plogis(mcmc.summaries.80$B$B.mean[[1]][1,])
+data.disp3[data.disp3 >= limits.disp3[2]] <- limits.disp3[2]
+data.disp3[data.disp3 <= limits.disp3[1]] <- limits.disp3[1]
+p3 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp3)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp3) +
+  labs(fill = "Dormant VI") +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+# limits.disp4 <- quantile(mcmc.summaries.80$B$B.mean[[1]][2,], probs = c(0.001,0.999), names = F) 
+# data.disp4   <- mcmc.summaries.80$B$B.mean[[1]][2,]
+
+limits.disp4 <- quantile(exp(mcmc.summaries.80$B$B.mean[[1]][2,]), probs = c(0.001,0.999), names = F) 
+data.disp4   <- exp(mcmc.summaries.80$B$B.mean[[1]][2,])
+data.disp4[data.disp4 >= limits.disp4[2]] <- limits.disp4[2]
+data.disp4[data.disp4 <= limits.disp4[1]] <- limits.disp4[1]
+p4 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp4)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp4) +
+  labs(fill = "Mid-season VI") +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+j <- 2
+k <- 3
+limits.disp1 <- quantile(mcmc.summaries.80$B$B.mean[[1]][3,], probs = c(0.001,0.999), names = F) 
+data.disp1   <- mcmc.summaries.80$B$B.mean[[1]][3,]
+data.disp1[data.disp1 >= limits.disp1[2]] <- limits.disp1[2]
+data.disp1[data.disp1 <= limits.disp1[1]] <- limits.disp1[1]
+p1 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp1)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp1) +
+  labs(fill = "SOS DOY") +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void()
+
+k <- 5
+limits.disp2 <- quantile(mcmc.summaries.80$B$B.mean[[1]][5,], probs = c(0.001,0.999), names = F) 
+data.disp2   <- mcmc.summaries.80$B$B.mean[[1]][5,]
+data.disp2[data.disp2 >= limits.disp2[2]] <- limits.disp2[2]
+data.disp2[data.disp2 <= limits.disp2[1]] <- limits.disp2[1]
+p2 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp2)) +
+  scale_fill_gradientn(colors = viridis(10), limits = limits.disp2) +
+  labs(fill = "EOS DOY") +
+  coord_fixed() +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+# 
+# ((p3 / p1) | (p4 / p2)) & theme(legend.justification = "left") & plot_annotation(title =  bquote("Intercept: "~beta["Intercept, -"]))
+
+((p3 / p1) | (p4 / p2)) & theme(legend.justification = "left")
+
+ggsave("beta_intercept_notitle.pdf", width = 7, height = 4, units = "in", device = "pdf")
+```
+
+```{r}
+
+mcmc.summaries.80 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_80_rho2_80.RDS")
+p <- 7
+length <- 89
+height <- 101
+spat.domain <- expand.grid(x = 1:length, y = 1:height)
+
+# limits.disp4 <- quantile(mcmc.summaries.80$B$B.mean[[1]][2,], probs = c(0.001,0.999), names = F) 
+
+data.disp1   <- plogis(mcmc.summaries.80$B$B.mean[[1]][1,] + 18*mcmc.summaries.80$B$B.mean[[2]][1,]) - plogis(mcmc.summaries.80$B$B.mean[[1]][1,] - 18*mcmc.summaries.80$B$B.mean[[2]][1,])
+
+
+
+limits.disp1 <- quantile(data.disp1 , probs = c(0.001,0.999), names = F) 
+data.disp1[data.disp1 >= limits.disp1[2]] <- limits.disp1[2]
+data.disp1[data.disp1 <= limits.disp1[1]] <- limits.disp1[1]
+p1 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp1)) +
+  scale_fill_gradient2(limits = limits.disp1) +
+  labs(fill = bquote(Delta~"Dormant VI")) +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+p1
+
+data.disp4   <- exp(mcmc.summaries.80$B$B.mean[[1]][2,] + 18*mcmc.summaries.80$B$B.mean[[2]][2,]) - exp(mcmc.summaries.80$B$B.mean[[1]][2,] - 18*mcmc.summaries.80$B$B.mean[[2]][2,])
+limits.disp4 <- quantile(data.disp4 , probs = c(0.001,0.999), names = F) 
+data.disp4[data.disp4 >= limits.disp4[2]] <- limits.disp4[2]
+data.disp4[data.disp4 <= limits.disp4[1]] <- limits.disp4[1]
+p4 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp4)) +
+  scale_fill_gradient2(limits = limits.disp4) +
+  labs(fill = bquote(Delta~"Mid-season VI")) +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+p4
+
+
+data.disp3   <- (mcmc.summaries.80$B$B.mean[[1]][3,] + 18*mcmc.summaries.80$B$B.mean[[2]][3,]) - (mcmc.summaries.80$B$B.mean[[1]][3,] - 18*mcmc.summaries.80$B$B.mean[[2]][3,])
+limits.disp3 <- quantile(data.disp3 , probs = c(0.001,0.999), names = F) 
+data.disp3[data.disp3 >= limits.disp3[2]] <- limits.disp3[2]
+data.disp3[data.disp3 <= limits.disp3[1]] <- limits.disp3[1]
+p3 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp3)) +
+  scale_fill_gradient2(limits = limits.disp3) +
+  labs(fill = bquote(Delta~"SOS DOY")) +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+p3
+
+data.disp5   <- (mcmc.summaries.80$B$B.mean[[1]][5,] + 18*mcmc.summaries.80$B$B.mean[[2]][5,]) - (mcmc.summaries.80$B$B.mean[[1]][5,] - 18*mcmc.summaries.80$B$B.mean[[2]][5,])
+limits.disp5 <- quantile(data.disp5 , probs = c(0.001,0.999), names = F) 
+data.disp5[data.disp5 >= limits.disp5[2]] <- limits.disp5[2]
+data.disp5[data.disp5 <= limits.disp5[1]] <- limits.disp5[1]
+p5 <- ggplot(spat.domain) +
+  geom_raster(aes(x = y, y = x, fill = data.disp5)) +
+  scale_fill_gradient2(limits = limits.disp5) +
+  labs(fill = bquote(Delta~"EOS DOY")) +
+  coord_fixed() +
+  theme(legend.box.spacing = unit(0, "pt")) +
+  theme_void() +
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"))
+
+p5
+
+((p1 / p3) | (p4 / p5)) & theme(legend.justification = "left")
+ggsave("beta_year_delta_notitle.pdf", width = 7, height = 4, units = "in", device = "pdf")
+```
+
+
+
+
+```{r}
+# load("/Users/matthewshisler/prepped_workspace_for_hf_lsp.RData")
+s <- 3878
+
+
+mcmc.summaries.99 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_summaries_rho1_99_rho2_99.RDS")
+ci_vi_99 <- readRDS("/Users/matthewshisler/Aug 25 Scripts/ci95_vi_full_99_99.RDS")
+
+date.vec.full <- seq(ymd("1984-01-01"),ymd("2020-12-31"),by='days')
+doy.vec.full <- yday(date.vec.full)
+mu.full <- double_logis7(doy.vec.full, point.agg.theta[, s]) - X[[s]][doy.vec.full,]%*%point.agg.theta[, s]
+year.vec.full <- year(date.vec.full) - 1983
+
+mean.vi.full <- rowSums(X[[s]][doy.vec.full,]*t(mcmc.summaries.99$Theta$Theta.mean[,year.vec.full,s])) + mu.full
+
+
+plot(date.vec, Y[s,], ylim = c(0,1), pch = 19)
+lines(date.vec.full, mean.vi.full, col = "red")
+
+idx1 <- year(date.vec) < 1997
+idx2 <- year(date.vec.full) < 1997
+p1 <- ggplot() + 
+        geom_point(aes_(x = date.vec[idx1], y = Y[s,idx1])) +
+        geom_line(aes_(x = date.vec.full[idx2], y = mean.vi.full[idx2]), color = "red") +
+        geom_ribbon(aes_(x = date.vec.full[idx2], ymin = ci_vi_99[1,idx2], ymax = ci_vi_99[2,idx2]), alpha = 0.4) + 
+        scale_y_continuous(limits = c(0,1)) +
+        ylab("VI") +
+        theme_bw() +
+        theme(axis.title.x=element_blank())
+
+idx1 <- year(date.vec) >= 1997 & year(date.vec) < 2010
+idx2 <- year(date.vec.full) >= 1997 & year(date.vec.full) < 2010
+p2 <- ggplot() + 
+        geom_point(aes_(x = date.vec[idx1], y = Y[s,idx1])) +
+        geom_line(aes_(x = date.vec.full[idx2], y = mean.vi.full[idx2]), color = "red") +
+        geom_ribbon(aes_(x = date.vec.full[idx2], ymin = ci_vi_99[1,idx2], ymax = ci_vi_99[2,idx2]), alpha = 0.4) +
+        scale_y_continuous(limits = c(0,1)) +
+        ylab("VI") +
+        theme_bw() +
+        theme(axis.title.x=element_blank())
+
+idx1 <- year(date.vec) >= 2010
+idx2 <- year(date.vec.full) >= 2010
+p3 <- ggplot() + 
+        geom_point(aes_(x = date.vec[idx1], y = Y[s,idx1])) +
+        geom_line(aes_(x = date.vec.full[idx2], y = mean.vi.full[idx2]), color = "red") +
+        geom_ribbon(aes_(x = date.vec.full[idx2], ymin = ci_vi_99[1,idx2], ymax = ci_vi_99[2,idx2]), alpha = 0.4) +
+        scale_y_continuous(limits = c(0,1)) +
+        ylab("VI") +
+        xlab("Date") +
+        theme_bw()
+
+
+
+p1/p2/p3
+
+# ggsave("example_site_fit.pdf", width = 7, height = 4, units = "in", device = "pdf")
+```
+
+```{r}
+idx1 <- year(date.vec) == 2001
+idx2 <- year(date.vec.full) == 2001
+p1 <- ggplot() + 
+        geom_point(aes_(x = date.vec[idx1], y = Y[s,idx1])) +
+        geom_line(aes_(x = date.vec.full[idx2], y = mean.vi.full[idx2]), color = "red") +
+        geom_ribbon(aes_(x = date.vec.full[idx2], ymin = ci_vi_99[1,idx2], ymax = ci_vi_99[2,idx2]), alpha = 0.4) + 
+        scale_y_continuous(limits = c(0,1)) +
+        ylab("VI") +
+        theme_bw() +
+        theme(axis.title.x=element_blank())
+p1
+```
+
+```{r}
+mcmc.summaries.99$sigma2$sigma2.mean
+mcmc.summaries.99$sigma2$sigma2.sd
+
+mcmc.summaries.99$sigma2$sigma2.lower
+mcmc.summaries.99$sigma2$sigma2.upper
+```
+
+```{r}
+
+mcmc.samples <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_samples_rho1_99_rho2_99_iters_6246_6495_chain_1.RDS")
+
+dim(mcmc.samples$keep.Theta)
+
+pixel.samples <- mcmc.samples$keep.Theta[,,3878,]
+
+
+
+date.vec.full <- seq(ymd("1984-01-01"),ymd("2020-12-31"),by='days')
+doy.vec.full <- yday(date.vec.full)
+mu.full <- double_logis7(doy.vec.full, point.agg.theta[, s]) - X[[s]][doy.vec.full,]%*%point.agg.theta[, s]
+year.vec.full <- year(date.vec.full) - 1983
+
+
+mean.vi.full <- matrix(nrow = 13515, ncol = 50)
+
+for(i in 1:50){
+  mean.vi.full[,i] <- rowSums(X[[3878]][doy.vec.full,]*t(pixel.samples[,year.vec.full,i])) + mu.full
+}
+
+dim(mean.vi.full)
+
+ci.vi.full <- apply(mean.vi.full, MARGIN = 1, quantile, probs = c(0.05, 0.95), names = F)
+
+
+dim(ci.vi.full)
+idx1 <- year(date.vec) >= 2020
+idx2 <- year(date.vec.full) >= 2020
+p3 <- ggplot() + 
+        geom_point(aes_(x = date.vec[idx1], y = Y[s,idx1])) +
+        geom_line(aes_(x = date.vec.full[idx2], y = mean.vi.full[idx2]), color = "red") +
+        geom_ribbon(aes(x = date.vec.full[idx2], ymax = ci.vi.full[2,idx2], ymin = ci.vi.full[1,idx2]), alpha = 0.2) +
+        # geom_line(aes_(x = date.vec.full[idx2], y = ci.vi.full[1,idx2]), color = "red", linetype = 2) +
+        # geom_line(aes_(x = date.vec.full[idx2], y = ci.vi.full[2,idx2]), color = "red", linetype = 2) +
+        scale_y_continuous(limits = c(0,1)) +
+        ylab("VI") +
+        xlab("Date") +
+        theme_bw()
+p3
+```
+
+
+```{r}
+mcmc.samples.1 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_samples_rho1_99_rho2_99_iters_6246_6495_chain_1.RDS")
+mcmc.samples.2 <- readRDS(file = "/Users/matthewshisler/Aug 25 Scripts/rho1_99_rho2_99_samples/mcmc_samples_rho1_99_rho2_99_iters_5996_6245_chain_1.RDS")
+
+mcmc.samples$iter.start
+mcmc.samples$iter.end
+
+result <- apply(mcmc.samples$keep.Theta, c(1,2,3), coda::geweke.diag)
+
+
+
+dim(mcmc.samples$keep.B[[1]])
+
+dim(mcmc.samples$keep.eta[[1]])
+
+apply(mcmc.samples$keep.eta[[1]], MARGIN = 1, function(x) coda::geweke.diag(x)$z)
+result<- apply(mcmc.samples$keep.B[[1]][1,,], MARGIN = 1, function(x) coda::geweke.diag(x)$z)
+length(result)
+
+?coda::gelman.diag
+
+?coda::as.mcmc.list()
+
+temp <- as.mcmc.list()
+
+```
+

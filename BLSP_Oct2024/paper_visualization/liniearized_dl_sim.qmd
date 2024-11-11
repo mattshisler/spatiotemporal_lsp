@@ -1,0 +1,127 @@
+---
+title: "Linearized DL sim"
+format: html
+---
+
+# Libraries
+```{r}
+library(blsp)
+library(ggplot2)
+library(lubridate)
+library(brms)
+library(rstanarm)
+library(tidyr)
+library(patchwork)
+```
+# Source functions
+```{r}
+
+source("/Users/matthewshisler/Spatial BLSP - 20 May 2024/nls_fit.R")
+source("/Users/matthewshisler/Spatial BLSP - 20 May 2024/spat_lin_blsp_mcmc.R")
+source("/Users/matthewshisler/Spatial BLSP - 20 May 2024/double_logis7.R")
+
+```
+
+```{r}
+model.form <- as.formula("y ~ 1/(1 + exp(-theta1)) + 
+                       (((exp(theta2) + (theta3 + (theta5 - theta3)/2 - t)*theta7/(1e4) - 1/(1 + exp(-theta1))) / (1 + exp((theta3 - t) / exp(theta4)))) - 
+                       ((exp(theta2) + (theta3 + (theta5 - theta3)/2 - t)*theta7/(1e4) - 1/(1 + exp(-theta1))) / (1 + exp((theta5 - t) / exp(theta6)))))")
+
+# obtain analytical gradient.
+dl.grad <- deriv(model.form, 
+                 c("theta1", "theta2", "theta3", 
+                   "theta4", "theta5", "theta6", "theta7"),
+                 function(theta1, theta2, theta3,
+                          theta4, theta5, theta6, theta7, t){})
+# define gradient matrix function.
+generate_grad_matrix <- function(theta, doy){
+  return(attr(dl.grad(theta[1], theta[2], theta[3],
+                      theta[4], theta[5], theta[6], theta[7],
+                      doy), "gradient"))
+}
+
+```
+
+# Plot for deviations of SOS.
+```{r, fig.width=6, fig.height=3}
+# start.date   <- as.Date("2001-01-01")
+# end.date     <- as.Date("2001-12-31") 
+# return.period <- 16
+# doy <- yday(seq(start.date, end.date, by = return.period))
+theta_center <- c(-1.4, -0.15, 100, 2.2, 265, 2.2, 5)
+
+n.vals <- 5
+theta_target <- matrix(rep(theta_center, n.vals), nrow = n.vals, byrow = T)
+theta_target[,3] <- theta_target[,3] + seq(-20, 20, by=10)
+
+disp_x <- seq(0,366,length.out = 1000)
+
+mid.vi <- double_logis7(100, theta_center)
+
+ggplot() +
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[1,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[2,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[4,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[5,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_center)), linewidth = 1.1) + 
+  geom_vline(aes(xintercept = 100), linetype = 2) +
+  annotate("segment", x = 130, y = 0.5, xend = 120, yend = mid.vi,
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 152, y = 0.50, label = deparse(bquote(theta[3]~"="~120))), parse = TRUE) +
+  annotate("segment", x = 130, y = 0.45, xend = 110, yend = mid.vi,
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 152, y = 0.45, label = deparse(bquote(theta[3]~"="~110))), parse = TRUE) +
+  annotate("segment", x = 70, y = 0.65, xend = 90, yend = mid.vi,
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 50, y = 0.65, label = deparse(bquote(theta[3]~"="~90))), parse = TRUE) +
+  annotate("segment", x = 70, y = 0.60, xend = 80, yend = mid.vi,
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 50, y = 0.60, label = deparse(bquote(theta[3]~"="~80))), parse = TRUE) +
+  geom_text(aes(x = 125, y = 0.1, label = deparse(bquote(tilde(theta)[3]~"="~100))), parse = TRUE) +
+  scale_y_continuous(limits = c(0.1,1)) +
+  theme_bw() +
+  labs(x = "Day of year, d", y = "VI")
+
+ggsave("/Users/matthewshisler/Spatial BLSP - 20 May 2024/paper_visualization/sos_lin_sim.pdf", device = "pdf", width = 6, height = 3)
+
+```
+
+```{r, fig.width=6, fig.height=3}
+theta_center <- c(-1.4, -0.15, 100, 2.2, 265, 2.2, 5)
+
+n.vals <- 5
+theta_target <- matrix(rep(theta_center, n.vals), nrow = n.vals, byrow = T)
+theta_target[,2] <- seq(-0.1, -0.3, by = -0.05)
+
+disp_x <- seq(0,366,length.out = 1000)
+
+mid.vi <- double_logis7(100, theta_center)
+
+ggplot() +
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[1,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[3,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[4,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_target[5,])), color = "red") + 
+  geom_line(aes(x = disp_x, y = double_logis7(disp_x, theta_center)), linewidth = 1.1) + 
+  geom_hline(aes(yintercept = exp(theta_center[2])), linetype = 2) +
+  annotate("segment", x = 165, y = 0.98, xend = 160, yend = double_logis7(160, theta_target[1,]),
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 190, y = 0.98, label = deparse(bquote(theta[2]~"="~-0.10))), parse = TRUE) +
+  annotate("segment", x = 165, y = 0.44, xend = 150, yend = double_logis7(150, theta_target[3,]),
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 190, y = 0.44, label = deparse(bquote(theta[2]~"="~-0.30))), parse = TRUE) +
+  annotate("segment", x = 171, y = 0.52, xend = 160, yend = double_logis7(160, theta_target[4,]),
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 199, y = 0.52, label = deparse(bquote(theta[2]~"="~-0.25))), parse = TRUE) +
+  annotate("segment", x = 176, y = 0.6, xend = 170, yend = double_logis7(170, theta_target[5,]),
+         arrow = arrow(type = "closed", length = unit(0.02, "npc"))) +
+  geom_text(aes(x = 201, y = 0.60, label = deparse(bquote(theta[2]~"="~-0.20))), parse = TRUE) +
+  geom_text(aes(x = 20, y = exp(theta_center[2]) + 0.05, label = deparse(bquote(tilde(theta)[2]~"="~-0.15))), parse = TRUE) +
+  scale_y_continuous(limits = c(0.1,1)) +
+  theme_bw() +
+  labs(x = "Day of year, d", y = "VI")
+
+
+```
+
+

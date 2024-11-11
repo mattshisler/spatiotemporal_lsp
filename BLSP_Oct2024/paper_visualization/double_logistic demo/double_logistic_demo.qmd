@@ -1,0 +1,271 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+```
+
+Define double logistic functions.
+```{r}
+
+double_logis7 <- function(d, theta){
+  # double logistic function.
+  # theta1 is transformed using the logistic function.
+  # theta2 is transformed using the 
+  # theta4 is transformed using the 
+  # theta6 is transformed using the 
+  # This allows for all parameters to follow a gaussian distribution
+  
+  theta[1] <- plogis(theta[1])
+  theta[2] <- exp(theta[2])
+  theta[4] <- exp(theta[4])
+  theta[6] <- exp(theta[6])
+  theta[7] <- theta[7]/(1e4)
+  
+  d1 <- 1 + exp((theta[3] - d)/theta[4])
+  
+  d2 <- 1 + exp((theta[5] - d)/theta[6])
+  
+  out <- theta[1] + (theta[2] + (theta[3] + (theta[5] - theta[3])/2  - d)*theta[7] - theta[1])*(1/d1 - 1/d2)
+  
+  
+  return(out)
+}
+
+double_logis6 <- function(d, theta){
+  # double logistic function.
+  # theta1 is transformed using the logistic function.
+  # theta2 is transformed using the 
+  # theta4 is transformed using the 
+  # theta6 is transformed using the 
+  # This allows for all parameters to follow a gaussian distribution
+  
+  theta[1] <- plogis(theta[1])
+  theta[2] <- exp(theta[2])
+  theta[4] <- exp(theta[4])
+  theta[6] <- exp(theta[6])
+  
+  d1 <- 1 + exp((theta[3] - d)/theta[4])
+  
+  d2 <- 1 + exp((theta[5] - d)/theta[6])
+  
+  out <- theta[1] + (theta[2] - theta[1])*(1/d1 - 1/d2)
+
+  
+  return(out)
+}
+
+```
+
+```{r}
+
+text.size <- 10
+
+theta <- c(-1.7, -0.1, 100, 2.2, 265, 2.8, 5)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta)), color = "red", linewidth = 1) +
+  geom_hline(aes(yintercept = plogis(theta[1])), linetype = "dashed") +
+  geom_hline(aes(yintercept = exp(theta[2])), linetype = "dashed") +
+  geom_vline(aes(xintercept = c(theta[3], theta[5])), linetype = "dashed") +
+  geom_abline(aes(intercept = exp(theta[2]) + (theta[7])/1e4*165, slope = -(theta[7])/1e4), linetype = "dashed") +
+  geom_errorbarh(aes(xmin = 85, xmax = 115, y = double_logis7(theta[3], theta), height = 0.075), linetype = "dashed") + 
+  geom_errorbarh(aes(xmin = 240, xmax = 290, y = double_logis7(theta[5], theta), height = 0.075), linetype = "dashed") + 
+  annotate("text", x = 10,            y = plogis(theta[1]) + 0.05,        label = bquote(f(theta[1])), size = text.size/.pt) +
+  annotate("text", x = 10,            y = exp(theta[2]) - 0.05,        label = bquote(g(theta[2])), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 12, y = 0.04,                              label = bquote(theta[3]), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 12, y = 0.04,                              label = bquote(theta[5]), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 37, y = double_logis7(theta[3], theta), label = bquote(g(theta[4])), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 47, y = double_logis7(theta[5], theta), label = bquote(g(theta[6])), size = text.size/.pt) +
+  annotate("text", x = 320, y = exp(theta[2]) - 320*theta[7]/1e4 + 0.03, label = bquote((theta[7]/c)*(d)), size = text.size/.pt, angle = -7.2) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw(base_size = text.size) +
+  ylab("VI") +
+  xlab("Day of year, d")
+
+ggsave("/Users/matthewshisler/Spatial BLSP - 20 May 2024/paper_visualization/double_logistic demo/double_logistic7_demo_reparam.pdf", device = "pdf", width = 5.5, height = 3)
+
+```
+
+
+
+
+
+
+
+Make 7-parameter doublelogistic function plot. 16 pt font.
+```{r}
+
+text.size <- 16
+
+theta <- c(-1.7, -0.1, 100, 2.2, 265, 2.8, 5)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta)), color = "red", linewidth = 1) +
+  geom_hline(aes(yintercept = plogis(theta[1])), linetype = "dashed") +
+  geom_vline(aes(xintercept = c(theta[3], theta[5])), linetype = "dashed") +
+  geom_abline(aes(intercept = exp(theta[2]), slope = -(theta[7])/1e4), linetype = "dashed") +
+  geom_errorbarh(aes(xmin = 85, xmax = 115, y = double_logis7(theta[3], theta), height = 0.075), linetype = "dashed") + 
+  geom_errorbarh(aes(xmin = 240, xmax = 290, y = double_logis7(theta[5], theta), height = 0.075), linetype = "dashed") + 
+  annotate("text", x = 10,            y = plogis(theta[1]) + 0.05,        label = bquote(g(theta[1])), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 12, y = 0.04,                              label = bquote(theta[3]), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 12, y = 0.04,                              label = bquote(theta[5]), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 37, y = double_logis7(theta[3], theta), label = bquote(h(theta[4])), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 47, y = double_logis7(theta[5], theta), label = bquote(h(theta[6])), size = text.size/.pt) +
+  annotate("text", x = 180, y = exp(theta[2]) - 180*theta[7]/1e4 + 0.05, label = bquote(h(theta[2]) - (theta[7]/c)*(d)), size = text.size/.pt, angle = -7.2) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw(base_size = text.size) +
+  ylab("VI") +
+  xlab("d")
+
+# ggsave("/Users/matthewshisler/Desktop/Bayesian_LSP_April_21/paper_visualization/double_logistic7_demo.pdf", device = "pdf", width = 7, height = 5)
+```
+
+Make 6-parameter double-logistic function plot. 16 point font.
+
+```{r}
+
+text.size <- 16
+
+theta <- c(-1.7, -0.1, 100, 2.2, 265, 2.8)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis6(1:366, theta)), color = "red", linewidth = 1) +
+  geom_hline(aes(yintercept = plogis(theta[1])), linetype = "dashed") +
+  geom_vline(aes(xintercept = c(theta[3], theta[5])), linetype = "dashed") +
+  geom_hline(aes(yintercept = exp(theta[2])), linetype = "dashed") +
+  geom_errorbarh(aes(xmin = 85, xmax = 115, y = double_logis6(theta[3], theta), height = 0.075), linetype = "dashed") + 
+  geom_errorbarh(aes(xmin = 240, xmax = 290, y = double_logis6(theta[5], theta), height = 0.075), linetype = "dashed") + 
+  annotate("text", x = 10,            y = plogis(theta[1]) + 0.05,        label = bquote(g(theta[1])), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 12, y = 0.04,                              label = bquote(theta[3]), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 12, y = 0.04,                              label = bquote(theta[5]), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 37, y = double_logis6(theta[3], theta), label = bquote(h(theta[4])), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 47, y = double_logis6(theta[5], theta), label = bquote(h(theta[6])), size = text.size/.pt) +
+  annotate("text", x = 180, y = exp(theta[2]) + 0.05, label = bquote(h(theta[2])), size = text.size/.pt) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw(base_size = text.size) +
+  ylab("VI") +
+  xlab("d")
+
+# ggsave("/Users/matthewshisler/Desktop/Bayesian_LSP_April_21/paper_visualization/double_logistic6_demo.pdf", device = "pdf", width = 7, height = 5)
+```
+
+
+Make 7-parameter doublelogistic function plot. 20 pt font.
+```{r}
+
+text.size <- 20
+
+theta <- c(-1.7, -0.1, 100, 2.2, 265, 2.8, 5)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta)), color = "red", linewidth = 1) +
+  geom_hline(aes(yintercept = plogis(theta[1])), linetype = "dashed") +
+  geom_vline(aes(xintercept = c(theta[3], theta[5])), linetype = "dashed") +
+  geom_abline(aes(intercept = exp(theta[2]), slope = -(theta[7])/1e4), linetype = "dashed") +
+  geom_errorbarh(aes(xmin = 85, xmax = 115, y = double_logis7(theta[3], theta), height = 0.075), linetype = "dashed") + 
+  geom_errorbarh(aes(xmin = 240, xmax = 290, y = double_logis7(theta[5], theta), height = 0.075), linetype = "dashed") + 
+  annotate("text", x = 10,            y = plogis(theta[1]) + 0.075,        label = bquote(g(theta[1])), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 12, y = 0.04,                              label = bquote(theta[3]), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 12, y = 0.04,                              label = bquote(theta[5]), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 40, y = double_logis7(theta[3], theta), label = bquote(h(theta[4])), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 50, y = double_logis7(theta[5], theta), label = bquote(h(theta[6])), size = text.size/.pt) +
+  annotate("text", x = 180, y = exp(theta[2]) - 180*theta[7]/1e4 + 0.075, label = bquote(h(theta[2]) - (theta[7]/c)*(d)), size = text.size/.pt, angle = -7.1) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw(base_size = text.size) +
+  ylab("VI") +
+  xlab("d")
+
+# ggsave("/Users/matthewshisler/Desktop/Bayesian_LSP_April_21/paper_visualization/double_logistic7_demo_20pt.pdf", device = "pdf", width = 7, height = 5)
+```
+
+Make 6-parameter double-logistic function plot. 20 point font.
+
+```{r}
+
+text.size <- 20
+
+theta <- c(-1.7, -0.1, 100, 2.2, 265, 2.8)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis6(1:366, theta)), color = "red", linewidth = 1) +
+  geom_hline(aes(yintercept = plogis(theta[1])), linetype = "dashed") +
+  geom_vline(aes(xintercept = c(theta[3], theta[5])), linetype = "dashed") +
+  geom_hline(aes(yintercept = exp(theta[2])), linetype = "dashed") +
+  geom_errorbarh(aes(xmin = 85, xmax = 115, y = double_logis6(theta[3], theta), height = 0.075), linetype = "dashed") + 
+  geom_errorbarh(aes(xmin = 240, xmax = 290, y = double_logis6(theta[5], theta), height = 0.075), linetype = "dashed") + 
+  annotate("text", x = 10,            y = plogis(theta[1]) + 0.075,        label = bquote(g(theta[1])), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 12, y = 0.04,                              label = bquote(theta[3]), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 12, y = 0.04,                              label = bquote(theta[5]), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 40, y = double_logis6(theta[3], theta), label = bquote(h(theta[4])), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 50, y = double_logis6(theta[5], theta), label = bquote(h(theta[6])), size = text.size/.pt) +
+  annotate("text", x = 180, y = exp(theta[2]) + 0.075, label = bquote(h(theta[2])), size = text.size/.pt) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw(base_size = text.size) +
+  ylab("VI") +
+  xlab("d")
+
+# ggsave("/Users/matthewshisler/Desktop/Bayesian_LSP_April_21/paper_visualization/double_logistic6_demo_20pt.pdf", device = "pdf", width = 7, height = 5)
+```
+
+
+New double-logistic function.
+```{r}
+double_logis7 <- function(d, theta){
+  # double logistic function.
+  # theta1 is transformed using the logistic function.
+  # theta2 is transformed using the 
+  # theta4 is transformed using the 
+  # theta6 is transformed using the 
+  # This allows for all parameters to follow a gaussian distribution
+  
+  theta[1] <- plogis(theta[1])
+  theta[2] <- exp(theta[2])
+  theta[4] <- exp(theta[4])
+  theta[6] <- exp(theta[6])
+  theta[7] <- theta[7]/(1e4)
+  
+  d1 <- 1 + exp((theta[3] - d)/theta[4])
+  
+  d2 <- 1 + exp((theta[5] - d)/theta[6])
+  
+  out <- theta[1] + (theta[2] + (theta[3] + (theta[5] - theta[3])/2  - d)*theta[7] - theta[1])*(1/d1 - 1/d2)
+  
+  
+  return(out)
+}
+
+```
+
+Make 7-parameter doublelogistic function plot. 16 pt font. New parameterization
+```{r}
+
+text.size <- 16
+
+theta <- c(-1.7, -0.1, 100, 2.2, 265, 2.8, 5)
+
+ggplot() +
+  geom_line(aes(x = 1:366, y = double_logis7(1:366, theta)), color = "red", linewidth = 1) +
+  geom_hline(aes(yintercept = plogis(theta[1])), linetype = "dashed") +
+  geom_hline(aes(yintercept = exp(theta[2])), linetype = "dashed") +
+  geom_vline(aes(xintercept = c(theta[3], theta[5])), linetype = "dashed") +
+  geom_abline(aes(intercept = exp(theta[2]) + (theta[7])/1e4*165, slope = -(theta[7])/1e4), linetype = "dashed") +
+  geom_errorbarh(aes(xmin = 85, xmax = 115, y = double_logis7(theta[3], theta), height = 0.075), linetype = "dashed") + 
+  geom_errorbarh(aes(xmin = 240, xmax = 290, y = double_logis7(theta[5], theta), height = 0.075), linetype = "dashed") + 
+  annotate("text", x = 10,            y = plogis(theta[1]) + 0.05,        label = bquote(f(theta[1])), size = text.size/.pt) +
+  annotate("text", x = 10,            y = exp(theta[2]) - 0.05,        label = bquote(g(theta[2])), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 12, y = 0.04,                              label = bquote(theta[3]), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 12, y = 0.04,                              label = bquote(theta[5]), size = text.size/.pt) +
+  annotate("text", x = theta[3] + 37, y = double_logis7(theta[3], theta), label = bquote(g(theta[4])), size = text.size/.pt) +
+  annotate("text", x = theta[5] + 47, y = double_logis7(theta[5], theta), label = bquote(g(theta[6])), size = text.size/.pt) +
+  annotate("text", x = 320, y = exp(theta[2]) - 320*theta[7]/1e4 + 0.03, label = bquote((theta[7]/c)*(d)), size = text.size/.pt, angle = -7.2) +
+  scale_y_continuous(limits = c(0,1)) +
+  theme_bw(base_size = text.size) +
+  ylab("VI") +
+  xlab("Day of year, d")
+
+ggsave("/Users/matthewshisler/Spatial BLSP - 20 May 2024/paper_visualization/double_logistic demo/double_logistic7_demo_reparam.pdf", device = "pdf", width = 7, height = 5)
+```
